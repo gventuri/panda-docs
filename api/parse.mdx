@@ -1,0 +1,90 @@
+---
+title: Parse
+description: Parse content from various document formats, including PDFs
+---
+
+# Parse
+
+The parse endpoint allows you to extract text content from various document formats, including PDFs.
+
+## Endpoint Overview
+
+- **URL**: `/v1/parse`
+- **Method**: POST
+- **Content-Type**: multipart/form-data
+
+## Request Parameters
+
+| Name            | Type   | Required | Description                   |
+| --------------- | ------ | -------- | ----------------------------- |
+| x-authorization | string | Yes      | Your API key (Bearer token)   |
+| file            | file   | Yes      | The file to extract text from |
+
+## How to Use
+
+1. Include your API key in the `x-authorization` header
+2. Provide the file you want to extract text from in the `file` parameter
+
+## Python Example
+
+Here's a Python script demonstrating the API usage:
+
+```python
+import requests
+import os
+
+# Configuration
+api_key = "your_api_key_here"
+api_url = "https://api.panda-etl.ai/v1/parse"
+file_path = "path/to/your/document.pdf"
+
+# Prepare the request
+headers = {
+    "x-authorization": f"Bearer {api_key}"
+}
+
+files = {
+    "file": (os.path.basename(file_path), open(file_path, "rb"))
+}
+
+# Send request and handle response
+response = requests.post(api_url, headers=headers, files=files, timeout=360)
+
+if response.status_code in [200, 201]:
+    result = response.json()
+    print("Text extraction successful:")
+    print(result)
+else:
+    print(f"Error {response.status_code}: {response.text}")
+```
+
+This script showcases:
+
+1. Setting up the request with the API key
+2. Opening and sending the file for text extraction
+3. Sending the POST request
+4. Handling the API response
+
+Remember to replace `"your_api_key_here"` with your actual API key and `"path/to/your/document.pdf"` with the path to the file you want to process.
+
+## Response
+
+A successful response will have a status code of 200 or 201 and a JSON body containing the extracted text. The exact format of the response may vary depending on the document type and content.
+
+## Error Handling
+
+The API may return the following error responses:
+
+- 400: Bad Request (e.g., invalid input or processing error)
+- 500: Internal Server Error
+
+Always check the response status code and handle errors appropriately in your application.
+
+## Best Practices
+
+- Ensure your files are in a supported format (e.g., PDF, DOCX)
+- Keep file sizes reasonable to avoid timeouts or processing issues
+- Implement proper error handling, especially for large-scale processing
+- Use appropriate retry mechanisms in production environments
+
+For more information on API integration and advanced usage, refer to our [main documentation](/index).

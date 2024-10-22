@@ -1,0 +1,139 @@
+---
+title: Getting Started with Panda ETL API
+description: A quick guide to start using the Panda ETL API for document processing and data extraction
+---
+
+# Getting Started with Panda ETL API
+
+This guide will help you get up and running with the Panda ETL API, allowing you to quickly start processing documents and extracting data.
+
+## Prerequisites
+
+- A Panda ETL API key (sign up at [https://panda-etl.ai](https://panda-etl.ai) if you don't have one)
+- Python 3.6 or later
+- `requests` library (`pip install requests`)
+
+## Step 1: Authentication
+
+All API requests require an API key for authentication. You'll need to include this key in the `x-authorization` header of each request.
+
+```python
+headers = {
+    "x-authorization": f"Bearer your_api_key_here"
+}
+```
+
+Replace `your_api_key_here` with your actual API key.
+
+## Step 2: Parse a Document and Extract Structured Data
+
+Let's start by parsing a PDF document and extracting specific fields in one go:
+
+```python
+import requests
+import json
+import os
+
+# Configuration
+api_key = "your_api_key_here"
+parse_url = "https://api.panda-etl.ai/v1/parse"
+extract_url = "https://api.panda-etl.ai/v1/extract/"
+file_path = "path/to/your/document.pdf"
+
+headers = {
+    "x-authorization": f"Bearer {api_key}"
+}
+
+# Step 1: Parse the document
+files = {
+    "file": (os.path.basename(file_path), open(file_path, "rb"))
+}
+
+parse_response = requests.post(parse_url, headers=headers, files=files, timeout=360)
+
+if parse_response.status_code != 200:
+    print(f"Parse Error {parse_response.status_code}: {parse_response.text}")
+    exit()
+
+pdf_content = parse_response.json()["text"]
+print("Document parsed successfully.")
+
+# Step 2: Extract structured data
+fields = [
+    {
+        "key": "invoice_number",
+        "type": "string",
+        "description": "The unique identifier for the invoice"
+    },
+    {
+        "key": "total_amount",
+        "type": "number",
+        "description": "The total amount on the invoice"
+    }
+]
+
+extract_data = {
+    "fields": json.dumps(fields),
+    "pdf_content": pdf_content
+}
+
+extract_response = requests.post(extract_url, headers=headers, data=extract_data)
+
+if extract_response.status_code == 200:
+    result = extract_response.json()
+    print("Extraction successful:")
+    print(f"Status: {result['status']}")
+    print(f"Message: {result['message']}")
+    print("Extracted data:")
+    for field, value in result['data'].items():
+        print(f"  {field}: {value}")
+else:
+    print(f"Extraction Error {extract_response.status_code}: {extract_response.text}")
+```
+
+This script demonstrates:
+
+1. Parsing a PDF document to extract its text content
+2. Using the extracted content to perform structured data extraction
+3. Handling the API responses for both steps
+
+Remember to replace `"your_api_key_here"` with your actual API key and `"path/to/your/document.pdf"` with the path to your PDF file.
+
+## Step 3: Monitor Your Usage
+
+Keep track of your API usage to manage your credits:
+
+```python
+import requests
+
+api_url = "https://api.panda-etl.ai/v1/user/usage"
+
+headers = {
+    "x-authorization": f"Bearer your_api_key_here"
+}
+
+response = requests.post(api_url, headers=headers)
+
+if response.status_code == 200:
+    usage_data = response.json()
+    print("Usage data retrieved successfully:")
+    print(usage_data)
+
+    if usage_data["credits_used"] >= usage_data["total_credits"]:
+        print("You have reached or exceeded your credit limit.")
+    else:
+        remaining_credits = usage_data["total_credits"] - usage_data["credits_used"]
+        print(f"You have {remaining_credits} credits remaining.")
+else:
+    print(f"Error {response.status_code}: {response.text}")
+```
+
+## Next Steps
+
+Now that you've got the basics down, you can:
+
+1. Explore more advanced features in our [API Reference](/api)
+2. Optimize your usage with our [Best Practices](/best-practices)
+3. Check out our [Examples](/examples) for more complex use cases
+
+If you need any help, don't hesitate to contact our support team at support@panda-etl.ai.

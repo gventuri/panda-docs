@@ -1,0 +1,113 @@
+---
+title: User Usage
+description: Retrieve information about your API usage
+---
+
+# User Usage
+
+The User Usage endpoint allows you to retrieve information about your API usage, including credit consumption and limits.
+
+## Endpoint Overview
+
+- **URL**: `/v1/user/usage`
+- **Method**: POST
+- **Content-Type**: application/json
+
+## Request Parameters
+
+| Name            | Type   | Required | Description                 |
+| --------------- | ------ | -------- | --------------------------- |
+| x-authorization | string | Yes      | Your API key (Bearer token) |
+
+## How to Use
+
+1. Include your API key in the `x-authorization` header
+2. Send a POST request to the endpoint
+
+## Python Example
+
+Here's a Python script demonstrating the API usage:
+
+```python
+import requests
+
+# Configuration
+api_key = "your_api_key_here"
+api_url = "https://api.panda-etl.ai/v1/user/usage"
+
+# Prepare the request
+headers = {
+    "x-authorization": f"Bearer {api_key}"
+}
+
+# Send request and handle response
+response = requests.post(api_url, headers=headers)
+
+if response.status_code in [200, 201]:
+    usage_data = response.json()
+    print("Usage data retrieved successfully:")
+    print(usage_data)
+else:
+    print(f"Error {response.status_code}: {response.text}")
+```
+
+This script showcases:
+
+1. Setting up the request with the API key
+2. Sending the POST request to retrieve usage data
+3. Handling the API response
+
+Remember to replace `"your_api_key_here"` with your actual API key.
+
+## Response
+
+A successful response will have a status code of 200 or 201 and a JSON body containing your usage data. The response includes the following information:
+
+- `credits_used`: The number of credits you have used
+- `total_credits`: Your total credit limit
+
+Example response:
+
+```json
+{
+  "credits_used": 800,
+  "total_credits": 1000
+}
+```
+
+## Interpreting the Response
+
+You can use this information to determine your current credit usage and remaining balance:
+
+1. **Credits Used**: The `credits_used` field shows how many credits you have consumed.
+2. **Total Credits**: The `total_credits` field represents your credit limit.
+3. **Remaining Credits**: You can calculate your remaining credits by subtracting `credits_used` from `total_credits`.
+
+For example, if you want to check if you've reached your credit limit, you can use the following logic:
+
+```python
+if usage_data["credits_used"] >= usage_data["total_credits"]:
+    print("You have reached or exceeded your credit limit.")
+else:
+    remaining_credits = usage_data["total_credits"] - usage_data["credits_used"]
+    print(f"You have {remaining_credits} credits remaining.")
+```
+
+## Error Handling
+
+The API may return the following error responses:
+
+- 400: Bad Request
+- 401: Unauthorized (invalid API key)
+- 500: Internal Server Error
+
+Always check the response status code and handle errors appropriately in your application.
+
+## Best Practices
+
+- Regularly check your usage to avoid unexpected service interruptions
+- Monitor your credit usage and set up alerts if you're approaching your limit
+- Use this endpoint to implement usage-based features or restrictions in your application
+- Consider requesting a credit limit increase if you consistently approach your limit
+
+For more information on API integration, billing, and advanced usage, refer to our [main documentation](/index).

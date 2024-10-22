@@ -1,0 +1,127 @@
+---
+title: Extract Fields
+description: Extract structured data from unstructured documents using our powerful API
+---
+
+# Extract Fields
+
+Convert raw document content into organized, machine-readable data with our Extract Fields API endpoint.
+
+## Endpoint Overview
+
+- **URL**: `/v1/extract/`
+- **Method**: POST
+- **Content-Type**: multipart/form-data
+
+## Request Parameters
+
+| Name            | Type   | Required | Description                      |
+| --------------- | ------ | -------- | -------------------------------- |
+| x-authorization | string | Yes      | Your API key (Bearer token)      |
+| fields          | array  | Yes      | List of field objects to extract |
+| pdf_content     | string | Yes      | PDF content as a string          |
+
+## How to Use
+
+1. Include your API key in the `x-authorization` header
+2. Specify the fields to extract in the `fields` array
+3. Provide the PDF content as a string in the `pdf_content` parameter
+
+For information on how to obtain PDF content as a string, refer to our [Parse Documentation](/parse).
+
+## Python Example
+
+Here's a Python script demonstrating the API usage:
+
+```python
+import requests
+import json
+
+# Configuration
+api_key = "your_api_key_here"
+api_url = "https://api.panda-etl.ai/v1/extract/"
+
+# Prepare the request
+headers = {
+    "x-authorization": f"Bearer {api_key}"
+}
+
+# Assume pdf_content is already available as a string
+# For information on how to obtain pdf_content, see /parse documentation
+pdf_content = "Your PDF content as a string"
+
+fields = [
+    {
+        "key": "invoice_number",
+        "type": "string",
+        "description": "The unique identifier for the invoice"
+    },
+    {
+        "key": "total_amount",
+        "type": "number",
+        "description": "The total amount on the invoice"
+    }
+]
+
+data = {
+    "fields": json.dumps(fields),
+    "pdf_content": pdf_content
+}
+
+# Send request and handle response
+response = requests.post(api_url, headers=headers, data=data)
+
+if response.status_code == 200:
+    result = response.json()
+    print("Extraction successful:")
+    print(f"Status: {result['status']}")
+    print(f"Message: {result['message']}")
+    print("Extracted data:")
+    for field, value in result['data'].items():
+        print(f"  {field}: {value}")
+else:
+    print(f"Error {response.status_code}: {response.text}")
+```
+
+This script showcases:
+
+1. Setting up the request with the API key
+2. Defining the fields to extract as an array of objects
+3. Using the PDF content as a string
+4. Sending the POST request
+5. Handling the API response
+
+Remember to replace `"your_api_key_here"` with your actual API key and `"Your PDF content as a string"` with your actual PDF content.
+
+## Response
+
+A successful response will have a status code of 200 and a JSON body like this:
+
+```json
+{
+  "status": "success",
+  "message": "Data extracted successfully from the file.",
+  "data": {
+    "invoice_number": "INV-2023-001",
+    "total_amount": 1500.5
+  }
+}
+```
+
+## Error Handling
+
+The API may return the following error responses:
+
+- 400: Bad Request (e.g., invalid input or processing error)
+- 500: Internal Server Error
+
+Always check the response status code and handle errors appropriately in your application.
+
+## Best Practices
+
+- Define your fields clearly with appropriate keys, types, and descriptions
+- Ensure high-quality PDF content for better extraction results
+- Implement proper error handling, especially for bulk processing
+- Use appropriate retry mechanisms in production environments
+
+For more information on API integration and advanced usage, refer to our [main documentation](/index).
