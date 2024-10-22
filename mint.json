@@ -37,14 +37,9 @@
   },
   "anchors": [
     {
-      "name": "API Reference",
-      "icon": "book-open",
-      "url": "/api"
-    },
-    {
       "name": "GitHub",
       "icon": "github",
-      "url": "https://github.com/panda-etl/api"
+      "url": "https://github.com/sinaptik-ai/panda-etl"
     },
     {
       "name": "Support",
